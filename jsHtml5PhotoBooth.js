@@ -11,7 +11,7 @@
  * http://www.opensource.org/licenses/mit-license.php
  * http://www.gnu.org/licenses/gpl.html
  * 
- * Take snapshots from webcam stream or canvas in html5
+ * Take snapshots from webcam stream in html5 with many features. Apply watermark, rotation and directly print the picture (on windows environments)
  */
 
 var jsHtml5PhotoBooth = function(){};
@@ -20,6 +20,7 @@ jsHtml5PhotoBooth.prototype = {
     url: 0,
     hasStopped: false,    
     mediaStream: '',
+    resultTagId: 'myPicture',
     videoTagId: 'video',
     canvasTagId: 'canvas',
     videoTag: 0,
@@ -29,12 +30,19 @@ jsHtml5PhotoBooth.prototype = {
     height: 0,
     mediaPath: '',    
     phpFile: '',
+    resultTagIdHost: '',    
     videoTagIdHost: '',
-    pictureFormat: '',
+    pictureExtension: '',
     pictureResource: '',
     pictureQuality: '',
+    showStreamOnFinish: true,
     hideWebcamWhileSnapshot: true,
     captureFromCanvas: false,
+    printPictureOnFinish: false,
+    printOptionComputerName: '',
+    printOptionSharedPrinterName: '',
+    watermarkImage: false,
+    rotation: false,
     
     /**
      * Get Proper html5 getUsermedia from window.navigator object, depending on the browser
@@ -85,67 +93,46 @@ jsHtml5PhotoBooth.prototype = {
     resetTags: function()
     {
         //Create video and canvas tag if not exists
-        this.createTag(this.videoTagId);
-        this.createTag(this.canvasTagId);         
+        this.createTag('video', this.videoTagId);
+        this.createTag('canvas', this.canvasTagId);         
     },
     
     /**
      * Create html tag inside html document (video, canvas)
      * 
      * @param {String} tag
+     * @param {String} tagId
      * @returns {jsHtml5Webcam.prototype@pro;videoTagmyTag|jsHtml5Webcam.prototype.createTag.myTag|jsHtml5Webcam.prototype.createTag.thisTag|Element}
      */
-    createTag: function(tag) 
-    {           
-        var myTag   = document.getElementById(tag);
-        
+    createTag: function(tag, tagId) 
+    {
+        var myTag   = document.getElementById(tagId);
+       
         if (myTag === null) {
             
             myTag = document.createElement(tag);
             
             if (tag === 'canvas') {
-                this.ctx                = myTag.getContext('2d');
                 myTag.width             = this.width;
                 myTag.height            = this.height;
+                myTag.id                = tagId;
                 myTag.style.position    = 'absolute';
                 myTag.style.visibility  = 'hidden';
-                myTag.id                = tag;
-                this.canvasTag          = myTag;
+                this.ctx                = myTag.getContext('2d');
+                this.canvasTag          = this.ctx.canvas;
             
             } else if (tag === 'video') {    
                 myTag.setAttribute('autoplay','true');
                 myTag.width             = this.width;
                 myTag.height            = this.height;
-                myTag.id                = tag;
+                myTag.id                = tagId;
                 if (this.mediaStream !== '') {
                     myTag.src = window.URL.createObjectURL(this.mediaStream);
                 }
                 this.videoTag   = myTag;
-            }        
-            document.getElementById(this.videoTagIdHost).appendChild(myTag);    
-        
-        } else {
-            
-            myTag.id = tag;
-            
-            if (tag === 'video') {
-                this.videoTag = myTag;
-                this.videoTag.setAttribute('autoplay','true');
-                this.videoTag.width   = this.width;
-                this.videoTag.height  = this.height;
-                if (this.mediaStream !== '') {
-                    this.videoTag.src = window.URL.createObjectURL(this.mediaStream);
-                }            
-                return this.videoTag;
-
-            } else if (tag === 'canvas') {
-                this.ctx       = myTag.getContext('2d');            
-                this.canvasTag = myTag;
-                this.canvasTag.width   = this.width;
-                this.canvasTag.height  = this.height;            
-                this.canvasTag.style.position   = 'absolute'; 
-                return this.canvasTag;            
             }
+            
+            document.getElementById(this.videoTagIdHost).appendChild(myTag);    
         }
     },                 
     
@@ -156,36 +143,45 @@ jsHtml5PhotoBooth.prototype = {
      */
     startCapture: function ()
     {
-        //Remove video tag and recreate it to empty cache
-        var videoElement = document.getElementById(this.videoTagId);   
-        if (videoElement) {
-            videoElement.remove();
+        //Remove result tag and recreate it to empty cache
+        var pictureResultElement = document.getElementById(this.resultTagId);   
+        if (pictureResultElement) {
+            pictureResultElement.remove();
         }
-        
-        this.resetTags();
         
         if (this.hideWebcamWhileSnapshot) {
             //Hide video stream while recording for performance
-            this.videoTag.style.visibility  = 'hidden';
-            this.videoTag.style.display     = 'none';
+            this.showHideStream('hide');
         }
 
         this.hasStopped = false;
 
-        
-        var extensionwithoutDot    = this.pictureFormat.replace('.', '');
-
-        //If we capture from canvas, we can apply live effects in real time
-        //If no live effects, we can directly capture from video stream
-        if (this.captureFromCanvas) {
-            var dataUrl             = this.canvasTag.toDataURL("image/" + extensionwithoutDot, this.pictureQuality);    
-        } else {
-            var dataUrl             = this.ctx.drawImage(this.videoTag, 0, 0, this.videoTag.width, this.videoTag.height);
+        //If we capture from canvas for live effects on webcam, we don't have to draw the image here
+        if (false === this.captureFromCanvas) {
+            this.ctx.drawImage(this.videoTag, 0, 0, this.videoTag.width, this.videoTag.height);
         }
-                
+
+        var dataUrl             = this.canvasTag.toDataURL("image/" + this.pictureExtension, this.pictureQuality);
         this.pictureResource    = dataUrl;         
 
         return true;        
+    },
+    
+    /**
+     * Show or hide video stream on demand
+     * 
+     * @param {String} status
+     * @returns {undefined}
+     */
+    showHideStream: function(status)
+    {
+        if (status === 'show') {
+            this.videoTag.style.visibility  = 'visible';
+            this.videoTag.style.display     = 'block';            
+        } else if (status === 'hide') {
+            this.videoTag.style.visibility  = 'hidden';
+            this.videoTag.style.display     = 'none';           
+        }
     },
     
     /**
@@ -198,17 +194,30 @@ jsHtml5PhotoBooth.prototype = {
     {
         if (method === 'save') {
             this.save(this.pictureResource, false);
+            
         } else if (method === 'download') {
-            this.downmload(this.pictureResource, false);
+            this.download(this.pictureResource, false);
+            
         } else if (method === 'stream') {
             this.stream(this.pictureResource);
+
+        } else if (method === 'saveAndDownload') {
+            this.save(this.pictureResource, false);
+            this.download(this.pictureResource, false);
+                      
         } else if (method === 'saveAndStream') {
             this.save(this.pictureResource, true);
+            
         } else if (method === 'downloadAndStream') {
             this.download(this.pictureResource, true);
+            
         } else {
             this.save(this.pictureResource, false);
         }
+        
+        if (this.showStreamOnFinish) {
+            this.showHideStream('show');
+        }       
         
         return true;
     },
@@ -222,19 +231,26 @@ jsHtml5PhotoBooth.prototype = {
      */
     save: function (blob, stream) {
          
-        var datas   = 'path='+this.mediaPath+'&format='+this.videoFormat;                  
+        var datas   = 'path='+this.mediaPath+'&type=picture&extension='+this.pictureExtension+'&print='+this.printPictureOnFinish+'&computerName='+this.printOptionComputerName+'&sharedPrinterName='+this.printOptionSharedPrinterName+'&watermark='+this.watermarkImage+'&rotation='+this.rotation;                  
 
+        //Because with classic ajax requests we are unable to send huge files
+        //We use original XMLHttpRequest object
         var client = new XMLHttpRequest();
         client.onreadystatechange = function() 
         {
             if (client.readyState === 4 && client.status === 200) 
             {
                 console.log(client.response);
+
+                //Get picture url with timestamp as parameter to avoid image caching
+                //We only get transformed picture if updates have been applied
+                var url = (this.rotation || this.watermarkImage) ? client.response + '?time=' + Date.now() : this.pictureResource;        
+                
                 if (stream) {
-                    this.stream(blob);
-                }
+                    this.stream(url);
+                }                
             }
-        }.bind(this);                    
+        }.bind(this);
         client.open("post", this.phpFile+'?'+datas, true);
         client.setRequestHeader("X-Requested-With", "XMLHttpRequest");
         client.setRequestHeader("cache-Control", "no-store, no-cache, must-revalidate");
@@ -249,22 +265,21 @@ jsHtml5PhotoBooth.prototype = {
     /**
      * Directly download picture from browser and stream it or not
      * 
-     * @param   {Object}    blob
-     * @paam    {Boolean}   stream
+     * @param   {Object|String} blob
+     * @paam    {Boolean}       stream
      * @returns {undefined}
      */
     download: function(blob, stream) {
         
-        var url             = window.URL.createObjectURL(blob);
         //Create a link
         var hf              = document.createElement('a');
 
         var temporaryId     = new Date().toISOString();
         
         //Define link attributes
-        hf.href             = url;
+        hf.href             = blob;
         hf.id               = temporaryId;
-        hf.download         = temporaryId + this.pictureFormat;
+        hf.download         = temporaryId + this.pictureExtension;
         hf.innerHTML        = hf.download;
         hf.style.display    = 'none';
         hf.style.visibility = 'hidden';
@@ -283,16 +298,15 @@ jsHtml5PhotoBooth.prototype = {
     /**
      * Stream
      * 
-     * @param {Object} blob
+     * @param {Object|String} url (blob or string)
      * @returns {undefined}
      */
-    stream: function(blob) {
+    stream: function(url) {
         
-        var url = window.URL.createObjectURL(blob);
-        
-        var img = document.createElementById('img');
+        var img = document.createElement('img');
         img.src = url;
+        img.id  = this.resultTagId;
         
-        document.getElementById(this.videoTagIdHost).appendChild(img);
+        document.getElementById(this.resultTagIdHost).appendChild(img);
     }    
 };
