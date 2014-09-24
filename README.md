@@ -74,7 +74,11 @@ I hope this greatful plugin will help you !
      * You can use "save", "saveAndDownload" or "saveAndStream", "downloadAndStream" parameters
      */
     function stopRecording() {
-        jsPhotoBooth.stopCapture('saveAndStream');
+        //For demo
+        jsPhotoBooth.stopCapture('downloadAndStream');
+
+        //Use this in production
+        //jsPhotoBooth.stopCapture('saveAndStream');
     }
 
         

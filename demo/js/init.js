@@ -60,6 +60,13 @@ function startCapture() {
     stopRecording();
 }
 
+/**
+ * You can use "save", "saveAndDownload" or "saveAndStream", "downloadAndStream" parameters
+ */
 function stopRecording() {
-    jsPhotoBooth.stopCapture('saveAndStream');
+    //For demo
+    jsPhotoBooth.stopCapture('downloadAndStream');
+
+    //Use this in production
+    //jsPhotoBooth.stopCapture('saveAndStream');
 }
