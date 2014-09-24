@@ -86,9 +86,6 @@ if (isset($_POST)) {
     }       
     
     
-    /*************************************
-     *** PRINT PICTURE IF SPECIFIED ***
-     ************************************/     
     //Return media url inside media directory
     echo $simplePath;    
 }

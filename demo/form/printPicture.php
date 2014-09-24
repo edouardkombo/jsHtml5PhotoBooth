@@ -3,7 +3,7 @@
 if (isset($_POST)) {
     
     /*************************************
-     *** GET PICTURE ***
+     *** GET PICTURE INFOS ***
      ************************************/    
     //Variables
     $pictureName        = (string) filter_input(INPUT_GET, 'pictureName');
