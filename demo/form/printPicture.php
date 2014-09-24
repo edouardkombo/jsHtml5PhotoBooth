@@ -8,7 +8,9 @@ if (isset($_POST)) {
     //Variables
     $pictureName        = (string) filter_input(INPUT_GET, 'pictureName');
     $computerName       = (string) filter_input(INPUT_GET, 'computerName'); 
-    $sharedPrinterName  = (string) filter_input(INPUT_GET, 'sharedPrinterName');     
+    $sharedPrinterName  = (string) filter_input(INPUT_GET, 'sharedPrinterName');
+    $mediaPath          = (string) filter_input(INPUT_GET, 'mediaPath');
+    $printBatch         = (string) filter_input(INPUT_GET, 'printBatch');    
 
     
     /*************************************
@@ -19,14 +21,13 @@ if (isset($_POST)) {
     // 3. Execute the system command
     // 4. Delete the batch file
     if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
-        $filename       = str_replace('/medias/Temp/', '', $pictureName);
-        echo var_dump($filename);
+        $filename       = str_replace('/', '\\', $pictureName);
         $printerPath    = "\\\\" . "$computerName\\" . $sharedPrinterName; 
-        $content        = "cd ../medias/Temp"."\n";
-        $content        .= "print /d:$printerPath $filename"."\n";
+        $content        = "cd ..$mediaPath"."\n";
+        $content        .= "print /d:$printerPath $filename"."\n";       
 
-        $batFile = (string) $_SERVER['DOCUMENT_ROOT'] . '/form/print.bat';
-
+        $batFile = (string) $_SERVER['DOCUMENT_ROOT'] . $printBatch;
+        
         $handle = fopen($batFile, 'w+');
         if (fwrite($handle, $content)) {
             fclose($handle);

@@ -40,6 +40,7 @@ jsPhotoBooth.printPictureOnFinish        = true;                //Works only on 
 jsPhotoBooth.printPhpFile                = 'form/printPicture.php'; //Php file to proceed to picture printing
 jsPhotoBooth.printOptionComputerName     = 'ALLINONE02';        //Computer name to target the network
 jsPhotoBooth.printOptionSharedPrinterName= 'SamsungPrinter';    //Name of the shared printer inside your windows network
+jsPhotoBooth.printBatchFile              = '/form/print.bat';    //Automatically generated and deleted
 
 /**
  * Apply watermark to the picture

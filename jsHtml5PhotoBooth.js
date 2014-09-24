@@ -11,7 +11,7 @@
  * http://www.opensource.org/licenses/mit-license.php
  * http://www.gnu.org/licenses/gpl.html
  * 
- * Take snapshots from webcam stream in html5 with many features. Apply watermark, rotation and directly print the picture (on windows environments)
+ * Take snapshots from webcam stream in html5 with many features. Apply watermark, rotation and directly print the picture (local environments only)
  */
 
 var jsHtml5PhotoBooth = function(){};
@@ -39,10 +39,12 @@ jsHtml5PhotoBooth.prototype = {
     hideWebcamWhileSnapshot: true,
     captureFromCanvas: false,
     printPictureOnFinish: false,
+    printPhpFile: '',
     printOptionComputerName: '',
     printOptionSharedPrinterName: '',
     watermarkImage: false,
     rotation: false,
+    printBatchFile: '',
     
     /**
      * Get Proper html5 getUsermedia from window.navigator object, depending on the browser
@@ -231,7 +233,7 @@ jsHtml5PhotoBooth.prototype = {
      */
     save: function (blob, stream) {
          
-        var datas   = 'path='+this.mediaPath+'&type=picture&extension='+this.pictureExtension+'&print='+this.printPictureOnFinish+'&computerName='+this.printOptionComputerName+'&sharedPrinterName='+this.printOptionSharedPrinterName+'&watermark='+this.watermarkImage+'&rotation='+this.rotation;                  
+        var datas   = 'path='+this.mediaPath+'&type=picture&extension='+this.pictureExtension+'&watermark='+this.watermarkImage+'&rotation='+this.rotation;                  
 
         //Because with classic ajax requests we are unable to send huge files
         //We use original XMLHttpRequest object
@@ -245,6 +247,11 @@ jsHtml5PhotoBooth.prototype = {
                 //Get picture url with timestamp as parameter to avoid image caching
                 //We only get transformed picture if updates have been applied
                 var url = (this.rotation || this.watermarkImage) ? client.response + '?time=' + Date.now() : this.pictureResource;        
+                
+                //Print picture if allowed
+                if (this.printPictureOnFinish) {
+                    this.printPicture(client.response);
+                }
                 
                 if (stream) {
                     this.stream(url);
@@ -260,6 +267,37 @@ jsHtml5PhotoBooth.prototype = {
         client.setRequestHeader("X-File-Name", encodeURIComponent('1'));
         client.setRequestHeader("Content-Type", "application/octet-stream");
         client.send(blob);                
+    },
+    
+    /**
+     * Method to print directly picture from php
+     * 
+     * @param {String} url
+     * @returns {undefined}
+     */
+    printPicture: function (url) 
+    {
+        var formatedUrl = url.replace(this.mediaPath, '');
+        
+        var datas   = 'printBatch='+this.printBatchFile+'&mediaPath='+this.mediaPath+'&pictureName='+formatedUrl+'&computerName='+this.printOptionComputerName+'&sharedPrinterName='+this.printOptionSharedPrinterName;                  
+
+        var client = new XMLHttpRequest();
+        client.onreadystatechange = function() 
+        {
+            if (client.readyState === 4 && client.status === 200) 
+            {
+                console.log(client.response);               
+            }
+        }.bind(this);
+        client.open("post", this.printPhpFile+'?'+datas, true);
+        client.setRequestHeader("X-Requested-With", "XMLHttpRequest");
+        client.setRequestHeader("cache-Control", "no-store, no-cache, must-revalidate");
+        client.setRequestHeader("cache-Control", "post-check=0, pre-check=0");
+        client.setRequestHeader("cache-Control", "max-age=0");
+        client.setRequestHeader("Pragma", "no-cache");            
+        client.setRequestHeader("X-File-Name", encodeURIComponent('1'));
+        client.setRequestHeader("Content-Type", "application/octet-stream");
+        client.send();        
     },
     
     /**

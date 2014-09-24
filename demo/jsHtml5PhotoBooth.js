@@ -11,7 +11,7 @@
  * http://www.opensource.org/licenses/mit-license.php
  * http://www.gnu.org/licenses/gpl.html
  * 
- * Take snapshots from webcam stream in html5 with many features. Apply watermark, rotation and directly print the picture (on windows environments)
+ * Take snapshots from webcam stream in html5 with many features. Apply watermark, rotation and directly print the picture (local environments only)
  */
 
 var jsHtml5PhotoBooth = function(){};
@@ -44,6 +44,7 @@ jsHtml5PhotoBooth.prototype = {
     printOptionSharedPrinterName: '',
     watermarkImage: false,
     rotation: false,
+    printBatchFile: '',
     
     /**
      * Get Proper html5 getUsermedia from window.navigator object, depending on the browser
@@ -249,7 +250,7 @@ jsHtml5PhotoBooth.prototype = {
                 
                 //Print picture if allowed
                 if (this.printPictureOnFinish) {
-                    this.printPicture(url);
+                    this.printPicture(client.response);
                 }
                 
                 if (stream) {
@@ -276,7 +277,9 @@ jsHtml5PhotoBooth.prototype = {
      */
     printPicture: function (url) 
     {
-        var datas   = 'pictureName='+url+'&computerName='+this.printOptionComputerName+'&sharedPrinterName='+this.printOptionSharedPrinterName;                  
+        var formatedUrl = url.replace(this.mediaPath, '');
+        
+        var datas   = 'printBatch='+this.printBatchFile+'&mediaPath='+this.mediaPath+'&pictureName='+formatedUrl+'&computerName='+this.printOptionComputerName+'&sharedPrinterName='+this.printOptionSharedPrinterName;                  
 
         var client = new XMLHttpRequest();
         client.onreadystatechange = function() 
