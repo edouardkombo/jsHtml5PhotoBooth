@@ -61,5 +61,5 @@ function startCapture() {
 }
 
 function stopRecording() {
-    jsPhotoBooth.stopCapture('downloadAndStream');
+    jsPhotoBooth.stopCapture('saveAndStream');
 }
