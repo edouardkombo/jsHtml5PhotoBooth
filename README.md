@@ -44,7 +44,6 @@ I hope this greatful plugin will help you !
     jsPhotoBooth.phpFile                     = '/form/pictureProcess.php'; //Php file that will proceed to picture saving on the server
 
     /**
-     * You must use "save", "saveAndDownload" or "saveAndStream" methods
      * This only works on local machines
      */
     //jsPhotoBooth.printPictureOnFinish        = true;                //Works only on windows system (You can update the batch file to your needs)
@@ -71,6 +70,9 @@ I hope this greatful plugin will help you !
         stopRecording();
     }
 
+    /**
+     * You can use "save", "saveAndDownload" or "saveAndStream", "downloadAndStream" parameters
+     */
     function stopRecording() {
         jsPhotoBooth.stopCapture('saveAndStream');
     }
