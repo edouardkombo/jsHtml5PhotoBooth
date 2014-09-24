@@ -50,6 +50,7 @@ I hope this greatful plugin will help you !
     //jsPhotoBooth.printPictureOnFinish        = true;                //Works only on windows system (You can update the batch file to your needs)
     //jsPhotoBooth.printOptionComputerName     = 'YOUR_COMPUTER_NAME';        //Computer name to target the network
     //jsPhotoBooth.printOptionSharedPrinterName= 'YOUR_SHARED_PRINTER_NAME';    //Name of the shared printer inside your windows network
+    //jsPhotoBooth.printBatchFile              = '/form/print.bat';    //Automatically generated and deleted
 
     /**
      * Apply watermark to the picture
