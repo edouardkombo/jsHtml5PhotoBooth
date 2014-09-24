@@ -317,7 +317,7 @@ jsHtml5PhotoBooth.prototype = {
         //Define link attributes
         hf.href             = blob;
         hf.id               = temporaryId;
-        hf.download         = temporaryId + this.pictureExtension;
+        hf.download         = temporaryId + '.' + this.pictureExtension;
         hf.innerHTML        = hf.download;
         hf.style.display    = 'none';
         hf.style.visibility = 'hidden';
