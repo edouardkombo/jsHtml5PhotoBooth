@@ -54,7 +54,7 @@ I hope this greatful plugin will help you !
     /**
      * Apply watermark to the picture
      */
-    //jsPhotoBooth.watermarkImage              = '/medias/headoo_watermark.jpg';  //Path where to find the watermark image
+    //jsPhotoBooth.watermarkImage              = '/medias/watermark.gif';  //Path where to find the watermark image
 
     /**
      * Apply rotation to the output
