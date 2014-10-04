@@ -5,7 +5,7 @@
  * Twitter: @EdouardKombo
  * Github:  https://github.com/edouardkombo
  * Blog:    http://creativcoders.wordpress.com
- * Url:     https://github.com/edouardkombo/jsHtml5VideoRecorder
+ * Url:     https://github.com/edouardkombo/jsHtml5PhotoBooth
  * 
  * Dual licensed under the MIT and GPL licenses:
  * http://www.opensource.org/licenses/mit-license.php
@@ -20,7 +20,6 @@ jsHtml5PhotoBooth.prototype = {
     url: 0,
     hasStopped: false,    
     mediaStream: '',
-    resultTagId: 'myPicture',
     videoTagId: 'video',
     canvasTagId: 'canvas',
     videoTag: 0,
@@ -29,22 +28,22 @@ jsHtml5PhotoBooth.prototype = {
     width: 0,
     height: 0,
     mediaPath: '',    
-    phpFile: '',
-    resultTagIdHost: '',    
+    phpFile: '',    
     videoTagIdHost: '',
     pictureExtension: '',
     pictureResource: '',
     pictureQuality: '',
-    showStreamOnFinish: true,
     hideWebcamWhileSnapshot: true,
     captureFromCanvas: false,
-    printPictureOnFinish: false,
     printPhpFile: '',
-    printOptionComputerName: '',
     printOptionSharedPrinterName: '',
     watermarkImage: false,
     rotation: false,
-    printBatchFile: '',
+    fileName: '',
+    client: '',
+    callback: '',
+    callbackType: '',
+    urlToStream: '',
     
     /**
      * Get Proper html5 getUsermedia from window.navigator object, depending on the browser
@@ -139,18 +138,21 @@ jsHtml5PhotoBooth.prototype = {
     },                 
     
     /**
+     * Set current id (timestamp)
+     * 
+     * @returns {undefined}
+     */
+    setFileName: function () {
+        this.fileName = Date.now();        
+    },    
+    
+    /**
      * Start photo capture
      * 
      * @returns {Boolean}
      */
-    startCapture: function ()
-    {
-        //Remove result tag and recreate it to empty cache
-        var pictureResultElement = document.getElementById(this.resultTagId);   
-        if (pictureResultElement) {
-            pictureResultElement.remove();
-        }
-        
+    startRecording: function ()
+    {   
         if (this.hideWebcamWhileSnapshot) {
             //Hide video stream while recording for performance
             this.showHideStream('hide');
@@ -192,122 +194,80 @@ jsHtml5PhotoBooth.prototype = {
      * @param {String} method
      * @returns {Boolean}
      */
-    stopCapture: function (method)
+    stopRecording: function (method)
     {
-        if (method === 'save') {
-            this.save(this.pictureResource, false);
+        this.setFileName();        
+        
+        this.save(this.pictureResource);
             
-        } else if (method === 'download') {
-            this.download(this.pictureResource, false);
-            
-        } else if (method === 'stream') {
-            this.stream(this.pictureResource);
-
-        } else if (method === 'saveAndDownload') {
-            this.save(this.pictureResource, false);
-            this.download(this.pictureResource, false);
-                      
-        } else if (method === 'saveAndStream') {
-            this.save(this.pictureResource, true);
-            
-        } else if (method === 'downloadAndStream') {
-            this.download(this.pictureResource, true);
-            
-        } else {
-            this.save(this.pictureResource, false);
+        if (method === 'download') {
+            this.download(this.pictureResource);   
         }
         
-        if (this.showStreamOnFinish) {
-            this.showHideStream('show');
-        }       
+        this.showHideStream('show');       
         
         return true;
     },
-       
-    /**
-     * Save picture on server and stream it or not
-     * 
-     * @param   {Object}    blob
-     * @param   {Boolean}   stream
-     * @returns {undefined}
-     */
-    save: function (blob, stream) {
-         
-        var datas   = 'path='+this.mediaPath+'&type=picture&extension='+this.pictureExtension+'&watermark='+this.watermarkImage+'&rotation='+this.rotation;                  
-
-        //Because with classic ajax requests we are unable to send huge files
-        //We use original XMLHttpRequest object
-        var client = new XMLHttpRequest();
-        client.onreadystatechange = function() 
-        {
-            if (client.readyState === 4 && client.status === 200) 
-            {
-                console.log(client.response);
-
-                //Get picture url with timestamp as parameter to avoid image caching
-                //We only get transformed picture if updates have been applied
-                var url = (this.rotation || this.watermarkImage) ? client.response + '?time=' + Date.now() : this.pictureResource;        
-                
-                //Print picture if allowed
-                if (this.printPictureOnFinish) {
-                    this.printPicture(client.response);
-                }
-                
-                if (stream) {
-                    this.stream(url);
-                }                
-            }
-        }.bind(this);
-        client.open("post", this.phpFile+'?'+datas, true);
-        client.setRequestHeader("X-Requested-With", "XMLHttpRequest");
-        client.setRequestHeader("cache-Control", "no-store, no-cache, must-revalidate");
-        client.setRequestHeader("cache-Control", "post-check=0, pre-check=0");
-        client.setRequestHeader("cache-Control", "max-age=0");
-        client.setRequestHeader("Pragma", "no-cache");            
-        client.setRequestHeader("X-File-Name", encodeURIComponent('1'));
-        client.setRequestHeader("Content-Type", "application/octet-stream");
-        client.send(blob);                
-    },
     
     /**
-     * Method to print directly picture from php
+     * XmlHttpRequest main method
      * 
      * @param {String} url
+     * @param {Object} datas
      * @returns {undefined}
      */
-    printPicture: function (url) 
-    {
-        var formatedUrl = url.replace(this.mediaPath, '');
+    xhr: function (url, datas) {
         
-        var datas   = 'printBatch='+this.printBatchFile+'&mediaPath='+this.mediaPath+'&pictureName='+formatedUrl+'&computerName='+this.printOptionComputerName+'&sharedPrinterName='+this.printOptionSharedPrinterName;                  
-
-        var client = new XMLHttpRequest();
-        client.onreadystatechange = function() 
+        this.client = new XMLHttpRequest();
+        this.client.onreadystatechange = function() 
         {
-            if (client.readyState === 4 && client.status === 200) 
+            if ((this.client.readyState === 4) && (this.client.status === 200)) 
             {
-                console.log(client.response);               
+                console.log(this.client.response);
+
+                this.urlToStream = this.mediaPath + this.fileName + '/' + this.fileName + '.' + this.pictureExtension;
+                this.callbackType = 'picture';
+                var fn = window[this.callback];
+                fn();
+                this.showHideStream('show');                
             }
         }.bind(this);
-        client.open("post", this.printPhpFile+'?'+datas, true);
-        client.setRequestHeader("X-Requested-With", "XMLHttpRequest");
-        client.setRequestHeader("cache-Control", "no-store, no-cache, must-revalidate");
-        client.setRequestHeader("cache-Control", "post-check=0, pre-check=0");
-        client.setRequestHeader("cache-Control", "max-age=0");
-        client.setRequestHeader("Pragma", "no-cache");            
-        client.setRequestHeader("X-File-Name", encodeURIComponent('1'));
-        client.setRequestHeader("Content-Type", "application/octet-stream");
-        client.send();        
+        this.client.open("post", url);
+        this.client.setRequestHeader("X-Requested-With", "XMLHttpRequest");
+        this.client.setRequestHeader("cache-Control", "no-store, no-cache, must-revalidate");
+        this.client.setRequestHeader("cache-Control", "post-check=0, pre-check=0");
+        this.client.setRequestHeader("cache-Control", "max-age=0");
+        this.client.setRequestHeader("Pragma", "no-cache");
+        this.client.send(datas);        
     },
     
     /**
-     * Directly download picture from browser and stream it or not
+     * Save picture on the disk
      * 
-     * @param   {Object|String} blob
-     * @paam    {Boolean}       stream
+     * @param   {Object}    blob
      * @returns {undefined}
      */
-    download: function(blob, stream) {
+    save: function (blob) {
+        
+        var formData = new FormData();
+        formData.append('picture-blob', blob);        
+        formData.append('extension', this.pictureExtension);
+        formData.append('watermark', this.watermarkImage);
+        formData.append('rotation', this.rotation);
+        formData.append('path', this.mediaPath);
+        formData.append('filename', this.fileName);      
+        formData.append('sharedPrinterName', this.printOptionSharedPrinterName);        
+                  
+        this.xhr(this.phpFile, formData);                
+    },
+    
+    /**
+     * Directly download picture from browser
+     * 
+     * @param   {Object|String} blob
+     * @returns {undefined}
+     */
+    download: function(blob) {
         
         //Create a link
         var hf              = document.createElement('a');
@@ -326,25 +286,6 @@ jsHtml5PhotoBooth.prototype = {
 
         //Simulate click on link to download file, and instantly delete link
         document.getElementById(hf.id).click();
-        document.getElementById(hf.id).remove();
-        
-        if (stream) {
-            this.stream(blob);
-        }        
-    },
-    
-    /**
-     * Stream
-     * 
-     * @param {Object|String} url (blob or string)
-     * @returns {undefined}
-     */
-    stream: function(url) {
-        
-        var img = document.createElement('img');
-        img.src = url;
-        img.id  = this.resultTagId;
-        
-        document.getElementById(this.resultTagIdHost).appendChild(img);
+        document.getElementById(hf.id).remove();        
     }    
 };

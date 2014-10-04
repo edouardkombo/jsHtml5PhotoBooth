@@ -22,65 +22,51 @@ I hope this greatful plugin will help you !
     //Instantiate the object
     var jsPhotoBooth = new jsHtml5PhotoBooth();
 
-    jsPhotoBooth.width                       = '640';               //Width of the canvas and video tag element
-    jsPhotoBooth.height                      = '480';               //Height of the canvas and video tag element
-
-    jsPhotoBooth.resultTagIdHost             = 'media';             //Div id where to store (the picture taken by the user)
-    jsPhotoBooth.resultTagId                 = 'myPicture';         //Id of the result picture to show to user inside the resultTagIdHost
-
-    jsPhotoBooth.videoTagIdHost              = 'media';             //Div id where to store (video and canvas html tag element)
-    jsPhotoBooth.videoTagId                  = 'video';             //Id of the video tag element
-    jsPhotoBooth.canvasTagId                 = 'canvas';            //Id of the canvas tag element
-
-    jsPhotoBooth.pictureExtension            = 'jpeg';             //Picture extension (jpeg, png, gif, bmp)
-    jsPhotoBooth.pictureQuality              = '1';                 //Picture quality (from 0.0 to 1)
-
-    jsPhotoBooth.captureFromCanvas           = false;               //If you want to apply live webcam effects or not, from another script
-
-    jsPhotoBooth.showStreamOnFinish          = true;                //Show the video stream after the picture has been taken
-    jsPhotoBooth.hideWebcamWhileSnapshot     = true;                //Hide webcam while snapshot, strongly improves performance
-
-    jsPhotoBooth.mediaPath                   = '/medias/Temp/';     //Path where to store te picture on the server
-    jsPhotoBooth.phpFile                     = '/form/pictureProcess.php'; //Php file that will proceed to picture saving on the server
-
-    /**
-     * This only works on local machines
-     */
-    //jsPhotoBooth.printPictureOnFinish        = true;                //Works only on windows system (You can update the batch file to your needs)
-    //jsPhotoBooth.printOptionComputerName     = 'YOUR_COMPUTER_NAME';        //Computer name to target the network
-    //jsPhotoBooth.printOptionSharedPrinterName= 'YOUR_SHARED_PRINTER_NAME';    //Name of the shared printer inside your windows network
-    //jsPhotoBooth.printBatchFile              = '/form/print.bat';    //Automatically generated and deleted
-
-    /**
-     * Apply watermark to the picture
-     */
-    //jsPhotoBooth.watermarkImage              = '/medias/watermark.gif';  //Path where to find the watermark image
-
-    /**
-     * Apply rotation to the output
-     */
-    //jsPhotoBooth.rotation                    = 0;  //Rotate the picture
+    jsPhotoBooth.width                       = '640';                       //Width of the canvas and video tag element
+    jsPhotoBooth.height                      = '480';                       //Height of the canvas and video tag element
+    
+    jsPhotoBooth.videoTagIdHost              = 'media';                     //Div id where to store (video and canvas html tag element)
+    jsPhotoBooth.videoTagId                  = 'video';                     //Id of the video tag element
+    jsPhotoBooth.canvasTagId                 = 'canvas';                    //Id of the canvas tag element
+    jsPhotoBooth.pictureExtension            = 'jpeg';                      //Picture extension (jpeg, png, gif, bmp)
+    jsPhotoBooth.pictureQuality              = '1';                         //Picture quality (from 0.0 to 1)
+    
+    jsPhotoBooth.captureFromCanvas           = false;                       //If you want to apply live webcam effects or not, from another script
+    jsPhotoBooth.hideWebcamWhileSnapshot     = true;                        //Hide webcam while snapshot, strongly improves performance
+    
+    jsPhotoBooth.mediaPath                   = '/medias/Temp/';             //Path where to store te picture on the server
+    jsPhotoBooth.phpFile                     = '/form/saveAndPrint.php';    //Php file that will proceed to picture saving on the server
+    jsPhotoBooth.callback                    = 'stream';                    //Callback method to call when process is finished
+    jsPhotoBooth.printOptionSharedPrinterName= 'Deskjet';                   //Name of the shared printer inside your windows network
+    jsPhotoBooth.watermarkImage              = '/medias/watermark.gif';     //Path where to find the watermark image
+    jsPhotoBooth.rotation                    = 0;                           //Rotate the picture
 
     //Start the plugin
     jsPhotoBooth.init();
 
 
-    function startCapture() {
-        jsPhotoBooth.startCapture();
+    function startRecording() {
+        jsPhotoBooth.startRecording();
         stopRecording();
     }
 
-    /**
-     * You can use "save", "saveAndDownload" or "saveAndStream", "downloadAndStream" parameters
-     */
     function stopRecording() {
         //For demo
-        jsPhotoBooth.stopCapture('downloadAndStream');
+        jsPhotoBooth.stopRecording('download');
 
         //Use this in production
-        //jsPhotoBooth.stopCapture('saveAndStream');
+        //jsPhotoBooth.stopRecording();
     }
 
+    //Show the converted media
+    function stream() {
+
+        var img = document.createElement('img');
+        img.src = jsPhotoBooth.urlToStream;
+        img.id  = 'resultPicture';
+
+        document.getElementById('containerId').appendChild(img);                
+    }
         
 3) Live Demonstration
 ---------------------
