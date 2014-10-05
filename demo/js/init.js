@@ -9,7 +9,7 @@ if((window.chrome !== null) && (window.navigator.vendor === "Google Inc.")) {
 var jsPhotoBooth = new jsHtml5PhotoBooth();
 
 /***************************************************
-	Init Html5 Video Streaming
+	Init Html5 photo booth object
 ***************************************************/
 jsPhotoBooth.width                       = '640';                       //Width of the canvas and video tag element
 jsPhotoBooth.height                      = '480';                       //Height of the canvas and video tag element
