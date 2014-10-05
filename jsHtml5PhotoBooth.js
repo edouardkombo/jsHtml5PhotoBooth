@@ -28,7 +28,7 @@ jsHtml5PhotoBooth.prototype = {
     width: 0,
     height: 0,
     mediaPath: '',    
-    phpFile: '',    
+    phpFile: '',
     videoTagIdHost: '',
     pictureExtension: '',
     pictureResource: '',
@@ -275,7 +275,7 @@ jsHtml5PhotoBooth.prototype = {
         formData.append('flip', this.flip);        
         formData.append('path', this.mediaPath);
         formData.append('filename', this.fileName);      
-        formData.append('sharedPrinterName', this.printOptionSharedPrinterName);        
+        formData.append('sharedPrinterName', this.printOptionSharedPrinterName);      
                   
         this.xhr(this.phpFile, formData);                
     },

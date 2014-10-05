@@ -53,17 +53,17 @@ if (file_put_contents($picturePath, $file)) {
      **************************************************/
     $wm->setImage(array('file' => $picturePath, 'quality' => 100)); // file to use and export quality
 
-    if ($watermark !== 'false') {
+    if ($watermark !== '') {
         $wm->setWatermark(array('file' => $fullWatermarkPath, 'position' => 'bottom right')); // watermark to use and it's position
         $wm->applyWatermark(); // apply watermark to the canvas
     }
 
-    if (($rotation !== 'false') && ($rotation !== '0')) {
+    if (($rotation !== '') && ($rotation !== '0')) {
         $wm->rotate($rotation);
     }    
 
     //Flip picture "horizontal" | "vertical"
-    if (!empty($flip)) {
+    if ($flip !== '') {
         $wm->flip($flip);    
     }
     
@@ -80,7 +80,7 @@ if (file_put_contents($picturePath, $file)) {
     // 3. Execute the system command
     // 4. Delete the batch file
     if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
-        if (!empty($sharedPrinterName)) {
+        if ($sharedPrinterName !== '') {
             $printerPath    = "\\\\" . "$computerName\\" . $sharedPrinterName; 
             $content        = "print /d:$printerPath $picturePath"."\n";       
 
