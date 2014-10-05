@@ -41,6 +41,9 @@ I hope this greatful plugin will help you !
     jsPhotoBooth.watermarkImage              = '/medias/watermark.gif';     //Path where to find the watermark image
     jsPhotoBooth.rotation                    = 0;                           //Rotate the picture
 
+    //Optional
+    jsPhotoBooth.flip                        = '';                          //Possible values (horizontal, vertical)
+
     //Start the plugin
     jsPhotoBooth.init();
 

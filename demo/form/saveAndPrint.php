@@ -23,6 +23,7 @@ $extension              = (string) filter_input(INPUT_POST, 'extension');
 $type                   = (string) filter_input(INPUT_POST, 'type'); 
 $watermark              = (string) filter_input(INPUT_POST, 'watermark');
 $rotation               = (string) filter_input(INPUT_POST, 'rotation');
+$flip                   = (string) filter_input(INPUT_POST, 'flip');
 $filename               = (string) filter_input(INPUT_POST, 'filename');
 $computerName           = (string) gethostname();
 $sharedPrinterName      = (string) filter_input(INPUT_POST, 'sharedPrinterName');
@@ -61,6 +62,11 @@ if (file_put_contents($picturePath, $file)) {
         $wm->rotate($rotation);
     }    
 
+    //Flip picture "horizontal" | "vertical"
+    if (!empty($flip)) {
+        $wm->flip($flip);    
+    }
+    
     if (!$wm->generate($picturePath) ) {
         // handle errors...
         print_r($wm->errors);

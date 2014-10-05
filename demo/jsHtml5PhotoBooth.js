@@ -44,6 +44,7 @@ jsHtml5PhotoBooth.prototype = {
     callback: '',
     callbackType: '',
     urlToStream: '',
+    flip: '',
     
     /**
      * Get Proper html5 getUsermedia from window.navigator object, depending on the browser
@@ -85,7 +86,6 @@ jsHtml5PhotoBooth.prototype = {
         this.mediaStream = stream;
         
         this.resetTags();
-       
     },
     
     /**
@@ -272,6 +272,7 @@ jsHtml5PhotoBooth.prototype = {
         formData.append('extension', this.pictureExtension);
         formData.append('watermark', this.watermarkImage);
         formData.append('rotation', this.rotation);
+        formData.append('flip', this.flip);        
         formData.append('path', this.mediaPath);
         formData.append('filename', this.fileName);      
         formData.append('sharedPrinterName', this.printOptionSharedPrinterName);        
