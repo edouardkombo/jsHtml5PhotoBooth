@@ -1,0 +1,42 @@
+{
+  "name": "jsHtml5PhotoBooth",
+  "main": "jsHtml5PhotoBooth.js",
+  "homepage": "https://github.com/edouardkombo/jsHtml5PhotoBooth",
+  "authors": [
+    "Edouard Kombo <edouard.kombo@gmail.com>"
+  ],
+  "description": "Take snapshots from webcam stream in html5 with many features. Apply watermark, rotation and directly print the picture (local environments only)",
+  "keywords": [
+    "jsHtml5PhotoBooth",
+    "html5",
+    "webcam",
+    "snapshot",
+    "html5",
+    "photo",
+    "taker",
+    "html5",
+    "photo",
+    "recorder",
+    "html5",
+    "photo",
+    "booth",
+    "photobooth"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "_release": "cef46ebe1a",
+  "_resolution": {
+    "type": "branch",
+    "branch": "master",
+    "commit": "cef46ebe1a512e2eb3d664e87f81bb4c898a1d0b"
+  },
+  "_source": "git://github.com/edouardkombo/jsHtml5PhotoBooth.git",
+  "_target": "*",
+  "_originalSource": "js-html5-photo-booth"
+}
