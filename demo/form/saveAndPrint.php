@@ -53,11 +53,6 @@ if (file_put_contents($picturePath, $file)) {
      **************************************************/
     $wm->setImage(array('file' => $picturePath, 'quality' => 100)); // file to use and export quality
 
-    if ($watermark !== '') {
-        $wm->setWatermark(array('file' => $fullWatermarkPath, 'position' => 'bottom right')); // watermark to use and it's position
-        $wm->applyWatermark(); // apply watermark to the canvas
-    }
-
     if (($rotation !== '') && ($rotation !== '0')) {
         $wm->rotate($rotation);
     }    
@@ -66,6 +61,11 @@ if (file_put_contents($picturePath, $file)) {
     if ($flip !== '') {
         $wm->flip($flip);    
     }
+    
+    if ($watermark !== '') {
+        $wm->setWatermark(array('file' => $fullWatermarkPath, 'position' => 'bottom right')); // watermark to use and it's position
+        $wm->applyWatermark(); // apply watermark to the canvas
+    }    
     
     if (!$wm->generate($picturePath) ) {
         // handle errors...
