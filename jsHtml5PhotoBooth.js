@@ -136,12 +136,13 @@ jsHtml5PhotoBooth.prototype = {
             document.getElementById(this.videoTagIdHost).appendChild(myTag);    
         
         } else {
-
+            
             if (tag === 'canvas') {
-                this.canvasTag                  = myTag;
-                this.canvasTag.id               = tagId;                
-                this.canvasTag.width            = this.width;
-                this.canvasTag.height           = this.height;               
+                myTag.id                        = tagId;                
+                myTag.width                     = this.width;
+                myTag.height                    = this.height;
+                this.ctx                        = myTag.getContext('2d');
+                this.canvasTag                  = this.ctx.canvas;                              
             } else {
                 this.videoTag                   = myTag;
                 this.videoTag.setAttribute('autoplay','true');
