@@ -45,6 +45,7 @@ jsHtml5PhotoBooth.prototype = {
     callbackType: '',
     urlToStream: '',
     flip: '',
+    serverResponse: '',
     
     /**
      * Get Proper html5 getUsermedia from window.navigator object, depending on the browser
@@ -242,6 +243,7 @@ jsHtml5PhotoBooth.prototype = {
         {
             if ((this.client.readyState === 4) && (this.client.status === 200)) 
             {
+                this.serverResponse = this.client.response;
                 console.log(this.client.response);
 
                 this.urlToStream = this.mediaPath + this.fileName + '/' + this.fileName + '.' + this.pictureExtension;
